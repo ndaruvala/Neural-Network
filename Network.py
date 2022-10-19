@@ -162,32 +162,33 @@ class Network:
         Nothing. Adjusts all weights and biases in the Network appropriately.
     """
 
-    def gradientDescent(self, training_data, mini_batch_size, test_data):
+    def gradientDescent(self, training_data, mini_batch_size, test_data, epochs):
         training_data = list(training_data)
         test_data = list(test_data)
+        test_data = test_data[:len(test_data)//2]
 
         # Randomly shuffle data and split into batches
-        random.shuffle(training_data)
-        mini_batches = []
-        for i in range(
-            0, len(training_data) - mini_batch_size, mini_batch_size
-        ):
-            mini_batches.append(training_data[i : i + mini_batch_size])
-        for mini_batch in mini_batches:
-            self.backpropagation(mini_batch)
-            # print("Backpropagation on mini_batch executed.")
-            correct = 0
-            for x, y in test_data:
-                if np.argmax(self.feedForward(x)) == y:
-                    correct += 1
-            accuracy = (correct / len(test_data)) * 100
-            print(f"Mini-Batch Completed: Accuracy: {accuracy}%")
-
+        for e in range(epochs):
+            random.shuffle(training_data)
+            mini_batches = []
+            for i in range(
+                0, len(training_data) - mini_batch_size, mini_batch_size
+            ):
+                mini_batches.append(training_data[i : i + mini_batch_size])
+            for mini_batch in mini_batches:
+                self.backpropagation(mini_batch)
+                correct = 0
+                for x, y in test_data:
+                    if np.argmax(self.feedForward(x)) == y:
+                        correct += 1
+                accuracy = (correct / len(test_data)) * 100
+                print(f"Mini batch {e} Completed. Accuracy: {accuracy}%")
+            print("Epoch completed")
 
 if __name__ == "__main__":
     (training_data, validation_data, test_data) = Data.load_data_wrapper()
     myNetwork = Network([784, 16, 16, 10])
-    myNetwork.gradientDescent(training_data, 64, test_data)
+    myNetwork.gradientDescent(training_data, 10, test_data, 30)
 
 
 # """
