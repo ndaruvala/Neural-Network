@@ -57,7 +57,8 @@ class Network:
         return Z, A
 
     '''
-    Propgates backwards to calculate the change in the weights and baises for one example.
+    Propgates backwards to calculate the change in the weights and baises 
+    for one example.
     '''
 
     def backpropagationHelper(self, example):
