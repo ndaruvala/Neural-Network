@@ -22,12 +22,11 @@ class Network:
     """
 
     def __init__(self, layers):
-        self.weights, self.biases = [], []
-        for l in range(1, len(layers)):
-            self.weights.append(
-                np.random.randn(layers[l], layers[l - 1])
-            )
-            self.biases.append(np.zeros((layers[l], 1)))
+        self.weights = [
+            np.random.randn(layers[l], layers[l - 1])
+            for l in range(1, len(layers))
+        ]
+        self.biases = [np.zeros((layers[l], 1)) for l in range(1, len(layers))]
         self.layers = layers
         self.sigmoid = np.vectorize(sigmoid)
         self.sigmoid_p = np.vectorize(sigmoid_p)
@@ -56,10 +55,10 @@ class Network:
             A.append(a)
         return Z, A
 
-    '''
+    """
     Propgates backwards to calculate the change in the weights and baises 
     for one example.
-    '''
+    """
 
     def backpropagationHelper(self, example):
         delta_dCdW = [np.zeros(w.shape) for w in self.weights]
@@ -71,8 +70,9 @@ class Network:
         delta_dCdW[-1] = np.dot(delta, np.transpose(A[-2]))
         # Backproping
         for i in range(len(self.weights) - 2, -1, -1):
-            delta = np.dot(np.transpose(
-                self.weights[i+1]), delta) * self.sigmoid_p(Z[i])
+            delta = np.dot(
+                np.transpose(self.weights[i + 1]), delta
+            ) * self.sigmoid_p(Z[i])
             delta_dCdB[i] += delta
             if i == 0:
                 delta_dCdW[i] += np.dot(delta, np.transpose(a))
@@ -87,10 +87,13 @@ class Network:
 
     def backpropagation(self, mini_batch):
         # Initialize nudges as zero
-        dCdW, dCdB = [], []
-        for l in range(1, len(self.layers)):
-            dCdW.append(np.zeros((self.layers[l], self.layers[l - 1])))
-            dCdB.append(np.zeros((self.layers[l], 1)))
+        dCdW = [
+            (np.zeros((self.layers[l], self.layers[l - 1])))
+            for l in range(1, len(self.layers))
+        ]
+        dCdB = [
+            (np.zeros((self.layers[l], 1))) for l in range(1, len(self.layers))
+        ]
         # Sets a default learning rate temporarily
         learn_rate = -3.0
         for example in mini_batch:
@@ -129,7 +132,9 @@ class Network:
         mini_batch_size: size of each mini batch
     """
 
-    def gradientDescent(self, training_data, mini_batch_size, test_data, epochs):
+    def gradientDescent(
+        self, training_data, mini_batch_size, test_data, epochs
+    ):
         training_data = list(training_data)
         test_data = list(test_data)
 
@@ -137,8 +142,10 @@ class Network:
         for e in range(epochs):
             random.shuffle(training_data)
             n = len(training_data)
-            mini_batches = [training_data[i: i + mini_batch_size]
-                            for i in range(0, n, mini_batch_size)]
+            mini_batches = [
+                training_data[i : i + mini_batch_size]
+                for i in range(0, n, mini_batch_size)
+            ]
             for mini_batch in mini_batches:
                 self.backpropagation(mini_batch)
             accuracy = self.getAccuracy(test_data)
